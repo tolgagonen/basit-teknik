@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BIST 4H Teknik Çizici v2</title>
+<style>
+  :root{
+    --bg:#f6f8ff; --bg2:#eefdf7; --panel:rgba(255,255,255,.78); --panel2:rgba(255,255,255,.92);
+    --line:#dfe7f3; --line2:#edf2fa; --text:#1f2937; --muted:#708098; --soft:#94a3b8;
+    --green:#20b987; --green2:#dff8ee; --red:#ef6f7b; --red2:#ffe8eb; --yellow:#f2b84b; --yellow2:#fff3d7;
+    --blue:#5b8def; --blue2:#e9f0ff; --cyan:#55d7cb; --cyan2:#e7fbf8; --purple:#a78bfa; --purple2:#f0eaff;
+    --white:#ffffff; --shadow:0 22px 60px rgba(82,101,130,.13); --shadow2:0 10px 26px rgba(82,101,130,.10);
+    --r:24px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);
+    background:
+      radial-gradient(circle at 10% -8%,rgba(123,218,202,.45) 0,transparent 34%),
+      radial-gradient(circle at 88% 0%,rgba(190,177,255,.36) 0,transparent 31%),
+      radial-gradient(circle at 50% 105%,rgba(255,207,231,.40) 0,transparent 35%),
+      linear-gradient(135deg,#fbfdff 0%,#f5f8ff 44%,#f1fff8 100%);
+    overflow-x:hidden;min-height:100vh;
+  }
+  body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(91,141,239,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(91,141,239,.045) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.65),transparent 76%)}
+  .wrap{width:100%;max-width:1600px;margin:0 auto;padding:18px 18px 26px;position:relative}
+  .top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;padding:3px 2px 0}
+  h1{margin:0;font-size:30px;letter-spacing:-.06em;line-height:1.04;color:#172033}
+  h1 .muted{display:inline-flex;align-items:center;vertical-align:middle;margin-left:5px;font-size:13px;letter-spacing:.02em;color:#5b8def;background:var(--blue2);border:1px solid #d9e5ff;border-radius:999px;padding:5px 8px}
+  .sub{margin-top:8px;color:var(--muted);font-size:13px;line-height:1.55;max-width:980px}
+  .badge{border:1px solid rgba(255,255,255,.68);background:rgba(255,255,255,.72);box-shadow:var(--shadow2);backdrop-filter:blur(14px);border-radius:999px;padding:9px 12px;font-size:12px;color:#53657e;white-space:nowrap}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,255,255,.66));border:1px solid rgba(255,255,255,.74);border-radius:var(--r);box-shadow:var(--shadow);backdrop-filter:blur(18px)}
+  .pad{padding:16px}.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted);line-height:1.42}.good{color:var(--green)}.bad{color:var(--red)}.warn{color:#c58a18}.info{color:var(--blue)}
+  .controls{display:grid;grid-template-columns:240px 1fr auto auto;gap:11px;align-items:end;margin-bottom:14px}
+  .field label{display:block;font-size:10.5px;font-weight:900;color:#7b8ba2;margin:0 0 6px 3px;text-transform:uppercase;letter-spacing:.075em}
+  .input{width:100%;border:1px solid #dbe5f2;background:rgba(255,255,255,.86);color:var(--text);border-radius:16px;padding:12px 13px;font-size:15px;font-weight:900;outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+  .input:focus{border-color:rgba(85,215,203,.75);box-shadow:0 0 0 4px rgba(85,215,203,.15),inset 0 1px 0 rgba(255,255,255,.9)}
+  button{font:inherit;border:0;border-radius:15px;padding:12px 15px;background:linear-gradient(180deg,#ffffff,#eef4ff);color:#263449;cursor:pointer;font-weight:900;border:1px solid #dbe5f2;box-shadow:0 10px 22px rgba(82,101,130,.10);transition:transform .16s ease,box-shadow .16s ease,filter .16s ease}
+  button:hover{filter:brightness(1.01);transform:translateY(-1px);box-shadow:0 14px 28px rgba(82,101,130,.14)}button:disabled{opacity:.58;cursor:not-allowed;transform:none}
+  .primary{background:linear-gradient(135deg,#6ee7d8,#8fb3ff 54%,#c6b7ff);color:#132033;border-color:rgba(255,255,255,.85)}
+  .small{font-size:12px;padding:8px 10px;border-radius:12px}.seg{display:flex;gap:8px;flex-wrap:wrap}
+  .seg button{background:rgba(255,255,255,.74);border:1px solid #dce6f5;padding:10px 13px;color:#5f6f86}
+  .seg button.active{background:linear-gradient(135deg,#e7fbf8,#eaf0ff);border-color:rgba(85,215,203,.65);color:#1f5664;box-shadow:0 10px 24px rgba(85,215,203,.13)}
+  .layout{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:14px}.chartCard{min-width:0}
+  .chartHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}.chartTitle{font-size:18px;font-weight:950;letter-spacing:-.04em;color:#172033}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.leg{font-size:11px;color:#52647d;border:1px solid #e1e9f5;background:rgba(255,255,255,.68);border-radius:999px;padding:6px 8px;box-shadow:0 5px 14px rgba(82,101,130,.07)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:999px;margin-right:4px;vertical-align:1px}
+  .chartWrap{position:relative;height:690px;border-radius:20px;background:linear-gradient(180deg,#fbfdff,#f6faff);border:1px solid #dfe7f3;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 18px 40px rgba(82,101,130,.09)}
+  .chartWrap canvas{width:100%;height:100%;display:block}.tooltip{position:absolute;display:none;pointer-events:none;background:rgba(255,255,255,.94);border:1px solid #dbe5f2;border-radius:14px;padding:9px 10px;font-size:11px;color:#24344a;box-shadow:0 18px 40px rgba(82,101,130,.20);z-index:5;white-space:nowrap;backdrop-filter:blur(14px)}
+  .watermark{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-size:74px;font-weight:950;color:rgba(31,41,55,.042);letter-spacing:-.08em;pointer-events:none}
+  .side{display:flex;flex-direction:column;gap:12px}.scoreBox{padding:17px;border-radius:22px;background:linear-gradient(135deg,#ddf8ee,#eaf2ff 62%,#f4edff);border:1px solid rgba(255,255,255,.82);box-shadow:var(--shadow)}
+  .scoreBox.warnBox{background:linear-gradient(135deg,#fff3d7,#edf5ff 58%,#f5f0ff);border-color:rgba(255,255,255,.82)}.scoreBox.badBox{background:linear-gradient(135deg,#ffe8eb,#fff5dc 58%,#eef5ff);border-color:rgba(255,255,255,.82)}
+  .scoreNum{font-size:44px;font-weight:950;letter-spacing:-.075em;line-height:1;color:#172033}.decision{display:inline-flex;border-radius:999px;border:1px solid rgba(255,255,255,.85);padding:7px 10px;font-size:12px;font-weight:950;margin-top:9px;background:rgba(255,255,255,.62);color:#30415a;box-shadow:0 8px 18px rgba(82,101,130,.09)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{padding:11px;border-radius:16px;background:rgba(255,255,255,.62);border:1px solid #e4ebf6;box-shadow:0 7px 18px rgba(82,101,130,.06)}
+  .metric .a{font-size:10px;color:#7b8ba2;font-weight:850;text-transform:uppercase;letter-spacing:.055em}.metric .b{font-size:18px;font-weight:950;margin-top:3px;letter-spacing:-.035em;color:#1f2937}.metric.big{grid-column:span 2}.metric.big .b{font-size:22px}
+  .section h3{font-size:14px;margin:0 0 9px;letter-spacing:-.02em;color:#1e2a3d}.levels{display:flex;flex-direction:column;gap:7px}
+  .level{display:grid;grid-template-columns:70px 1fr auto;gap:8px;align-items:center;border:1px solid #e4ebf6;background:rgba(255,255,255,.62);border-radius:14px;padding:8px}.level .p{font-weight:950}.strength{height:7px;background:#e9eef7;border-radius:999px;overflow:hidden}.strength i{display:block;height:100%;background:linear-gradient(90deg,#ef6f7b,#f2b84b,#20b987)}
+  .comment{padding:13px;border-radius:17px;background:rgba(255,255,255,.64);border:1px solid #e4ebf6;font-size:13px;color:#384861;line-height:1.52}.comment ul{margin:0;padding-left:18px}.comment li{margin:5px 0}
+  .log{height:110px;overflow:auto;background:rgba(255,255,255,.64);border:1px solid #e4ebf6;border-radius:16px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:#5d6f88;white-space:pre-wrap}
+  .footer{margin-top:12px;color:var(--muted);font-size:11px;line-height:1.45}.notice{padding:11px;background:var(--yellow2);border:1px solid #ffe2a2;border-radius:16px;color:#8c6313;font-size:12px;line-height:1.43}
+  details summary{cursor:pointer;color:#52647d;font-size:12px;margin-top:10px;font-weight:800}details[open] summary{margin-bottom:8px}.workerLine{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:8px}code{color:#53657e;background:#f3f6fb;border:1px solid #e4ebf6;border-radius:7px;padding:1px 5px}
+  .spinner{width:14px;height:14px;border:2px solid rgba(19,32,51,.25);border-top-color:#132033;border-radius:50%;display:none;animation:spin .8s linear infinite;margin-right:6px;vertical-align:-2px}@keyframes spin{to{transform:rotate(360deg)}}.loading .spinner{display:inline-block}
+  @media(max-width:1050px){.layout{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.chartWrap{height:560px}.legend{justify-content:flex-start}.top{display:block}.top .badge{display:inline-block;margin-top:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>BIST 4H Teknik Çizici <span class="muted">v2</span></h1>
+      <div class="sub">Tek hisse için 1 saatlik veriyi worker’dan çeker, tarayıcı içinde 4 saatlik mumlara dönüştürür; destek, direnç, EMA, regresyon kanalı ve giriş/stop/hedef bölgelerini ferah bir grafik ekranında gösterir.</div>
+    </div>
+    <div class="badge" id="clock">-</div>
+  </div>
+
+  <section class="card pad">
+    <div class="controls">
+      <div class="field">
+        <label>Hisse kodu</label>
+        <input id="symbol" class="input" value="TSKB" placeholder="TSKB" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label>Veri aralığı</label>
+        <div class="seg" id="rangeSeg">
+          <button data-range="3mo">3 ay</button>
+          <button data-range="6mo">6 ay</button>
+          <button data-range="1y" class="active">1 yıl</button>
+        </div>
+      </div>
+      <button id="analyzeBtn" class="primary"><span class="spinner"></span>Analiz Et</button>
+      <button id="clearBtn">Temizle</button>
+    </div>
+    <details>
+      <summary>Worker ayarı</summary>
+      <div class="workerLine">
+        <input id="workerUrl" class="input" value="https://bist30dataslave.akiftolgagonen.workers.dev" />
+        <button id="saveWorker" class="small">Kaydet</button>
+      </div>
+      <div class="tiny" style="margin-top:7px">Kullanım: <code>?symbol=TSKB&amp;range=1y&amp;interval=60m</code>. 4H mumlar HTML içinde üretilir.</div>
+    </details>
+  </section>
+
+  <div class="layout" style="margin-top:14px">
+    <main class="card pad chartCard">
+      <div class="chartHead">
+        <div>
+          <div class="chartTitle" id="chartTitle">TSKB 4H Teknik Grafik</div>
+          <div class="tiny" id="chartSub">Henüz analiz yapılmadı.</div>
+        </div>
+        <div class="legend">
+          <span class="leg"><span class="dot" style="background:#20b987"></span>Destek</span>
+          <span class="leg"><span class="dot" style="background:#ef6f7b"></span>Direnç</span>
+          <span class="leg"><span class="dot" style="background:#5b8def"></span>EMA20</span>
+          <span class="leg"><span class="dot" style="background:#f2b84b"></span>EMA50</span>
+          <span class="leg"><span class="dot" style="background:#a78bfa"></span>EMA200</span>
+          <span class="leg"><span class="dot" style="background:#55d7cb"></span>Kanal</span>
+        </div>
+      </div>
+      <div class="chartWrap" id="chartWrap">
+        <canvas id="chart"></canvas>
+        <div class="watermark" id="wm">4H</div>
+        <div class="tooltip" id="tip"></div>
+      </div>
+    </main>
+
+    <aside class="side">
+      <section class="scoreBox warnBox" id="scoreBox">
+        <div class="tiny">Teknik puan</div>
+        <div class="scoreNum" id="scoreNum">-</div>
+        <div class="decision" id="decision">Analiz bekleniyor</div>
+      </section>
+
+      <section class="card pad">
+        <div class="grid2">
+          <div class="metric"><div class="a">Son fiyat</div><div class="b" id="mPrice">-</div></div>
+          <div class="metric"><div class="a">Trend</div><div class="b" id="mTrend">-</div></div>
+          <div class="metric"><div class="a">Kanal konumu</div><div class="b" id="mChannel">-</div></div>
+          <div class="metric"><div class="a">Momentum</div><div class="b" id="mMomentum">-</div></div>
+          <div class="metric big"><div class="a">Giriş bölgesi</div><div class="b" id="mEntry">-</div></div>
+          <div class="metric"><div class="a">Stop</div><div class="b bad" id="mStop">-</div></div>
+          <div class="metric"><div class="a">Hedef</div><div class="b good" id="mTarget">-</div></div>
+        </div>
+      </section>
+
+      <section class="card pad section">
+        <h3>Yakın destekler</h3>
+        <div class="levels" id="supports"><div class="tiny">-</div></div>
+      </section>
+
+      <section class="card pad section">
+        <h3>Yakın dirençler</h3>
+        <div class="levels" id="resists"><div class="tiny">-</div></div>
+      </section>
+
+      <section class="card pad section">
+        <h3>Yorum</h3>
+        <div class="comment"><ul id="comments"><li>Hisse kodu yazıp analiz et.</li></ul></div>
+      </section>
+
+      <section class="card pad section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="margin:0">Log</h3><button id="clearLog" class="small">Temizle</button></div>
+        <div class="log" id="log"></div>
+        <div class="footer">Yatırım tavsiyesi değildir. Public veri gecikmeli olabilir; emir öncesi broker ekranı teyidi gerekir.</div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const DEFAULT_WORKER = "https://bist30dataslave.akiftolgagonen.workers.dev";
+  const CACHE_MS = 4 * 60 * 1000;
+  const REQ_TIMEOUT = 35000;
+  let selectedRange = "1y";
+  let state = {raw:[], bars:[], analysis:null, hover:-1};
+
+  function init(){
+    $("workerUrl").value = localStorage.getItem("bist4h_worker") || DEFAULT_WORKER;
+    $("symbol").value = localStorage.getItem("bist4h_symbol") || "TSKB";
+    selectedRange = localStorage.getItem("bist4h_range") || "1y";
+    document.querySelectorAll("#rangeSeg button").forEach(b => b.classList.toggle("active", b.dataset.range === selectedRange));
+    $("analyzeBtn").addEventListener("click", analyzeSymbol);
+    $("symbol").addEventListener("keydown", e => { if(e.key === "Enter") analyzeSymbol(); });
+    $("saveWorker").addEventListener("click", () => { localStorage.setItem("bist4h_worker", $("workerUrl").value.trim()); log("Worker kaydedildi."); });
+    $("clearBtn").addEventListener("click", clearAll);
+    $("clearLog").addEventListener("click", () => $("log").textContent = "");
+    $("rangeSeg").addEventListener("click", e => {
+      const btn = e.target.closest("button[data-range]"); if(!btn) return;
+      selectedRange = btn.dataset.range; localStorage.setItem("bist4h_range", selectedRange);
+      document.querySelectorAll("#rangeSeg button").forEach(b => b.classList.toggle("active", b === btn));
+    });
+    const wrap = $("chartWrap");
+    wrap.addEventListener("mousemove", onMouseMove);
+    wrap.addEventListener("mouseleave", () => { state.hover = -1; $("tip").style.display = "none"; draw(); });
+    window.addEventListener("resize", () => draw());
+    tickClock(); setInterval(tickClock, 1000);
+    drawEmpty();
+  }
+  function tickClock(){ $("clock").textContent = new Date().toLocaleString("tr-TR", {hour:"2-digit", minute:"2-digit", second:"2-digit"}); }
+  function log(msg){ const line = `[${new Date().toLocaleTimeString("tr-TR")}] ${msg}\n`; $("log").textContent += line; $("log").scrollTop = $("log").scrollHeight; }
+  function setBusy(b){ $("analyzeBtn").disabled = b; $("analyzeBtn").classList.toggle("loading", b); }
+  function cleanSym(s){ return String(s || "").trim().toUpperCase().replace(/\.IS$/, "").replace(/[^A-Z0-9]/g, "").slice(0,12); }
+  function normalizedWorkerUrl(){ let u = $("workerUrl").value.trim() || DEFAULT_WORKER; if(!/^https?:\/\//i.test(u)) u = "https://"+u; return u.replace(/\/+$/, ""); }
+  function fmt(n){ if(!Number.isFinite(n)) return "-"; if(n>=1000) return n.toFixed(1); if(n>=100) return n.toFixed(2); if(n>=10) return n.toFixed(2); return n.toFixed(3); }
+  function pct(n){ return Number.isFinite(n) ? (n*100).toFixed(2)+"%" : "-"; }
+  function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+  function avg(a){ return a && a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+
+  async function analyzeSymbol(){
+    const sym = cleanSym($("symbol").value);
+    if(!sym){ log("Hisse kodu boş."); return; }
+    localStorage.setItem("bist4h_symbol", sym);
+    setBusy(true);
+    try{
+      log(`${sym}: veri çekiliyor (${selectedRange}/60m)`);
+      const raw = await fetchWorker(sym, selectedRange, "60m");
+      let bars4h = aggregateTo4H(raw.candles);
+      if(bars4h.length < 35){
+        log(`${sym}: 4H bar az (${bars4h.length}); 1d bağlam deneniyor.`);
+        const d = await fetchWorker(sym, selectedRange, "1d");
+        bars4h = d.candles.map(x => ({...x, label:dateLabel(x.t), groupKey:String(x.t), sourceCount:1, isDaily:true}));
+      }
+      if(bars4h.length < 25) throw new Error(`yeterli mum yok: ${bars4h.length}`);
+      const analysis = analyze4H(sym, bars4h, raw);
+      state = {raw:raw.candles, bars:bars4h, analysis, hover:-1};
+      renderAnalysis(analysis);
+      draw();
+      log(`${sym}: OK ${raw.provider || raw.route || "worker"} | 60m ${raw.candles.length} mum → ${bars4h.length} adet ${bars4h[0].isDaily?"1D":"4H"} mum | skor ${analysis.score}`);
+    }catch(e){
+      log(`HATA: ${String(e.message || e)}`);
+      alert("Veri/analiz hatası: " + String(e.message || e));
+    }finally{ setBusy(false); }
+  }
+
+  async function fetchWorker(sym, range, interval){
+    const key = `bist4h_cache_${sym}_${range}_${interval}_${normalizedWorkerUrl()}`;
+    try{ const cached = JSON.parse(localStorage.getItem(key) || "null"); if(cached && Date.now()-cached.t < CACHE_MS) return {...cached.v, cached:true}; }catch(e){}
+    const url = `${normalizedWorkerUrl()}/?symbol=${encodeURIComponent(sym)}&range=${encodeURIComponent(range)}&interval=${encodeURIComponent(interval)}&kind=main`;
+    const ac = new AbortController(); const timer = setTimeout(()=>ac.abort(), REQ_TIMEOUT);
+    try{
+      const res = await fetch(url, {signal:ac.signal, cache:"no-store", headers:{"accept":"application/json,text/plain,*/*"}});
+      const text = await res.text(); let body;
+      try{ body = JSON.parse(text); }catch(e){ throw new Error("Worker JSON dönmedi: "+text.slice(0,120)); }
+      if(!res.ok || !body.ok) throw new Error(body.error || `HTTP ${res.status}`);
+      const candles = (body.candles || []).map(x => ({t:Number(x.t),open:Number(x.open),high:Number(x.high),low:Number(x.low),close:Number(x.close),volume:Number(x.volume||0)})).filter(x => Number.isFinite(x.t) && [x.open,x.high,x.low,x.close].every(Number.isFinite)).sort((a,b)=>a.t-b.t);
+      if(!candles.length) throw new Error("mum yok");
+      const out = {symbol:sym, range, interval, provider:body.provider || "worker", quality:body.quality || "-", candles, meta:body.meta || {}};
+      try{ localStorage.setItem(key, JSON.stringify({t:Date.now(), v:out})); }catch(e){}
+      return out;
+    }finally{ clearTimeout(timer); }
+  }
+
+  function trParts(t){
+    const parts = new Intl.DateTimeFormat("en-CA", {timeZone:"Europe/Istanbul", year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", hour12:false}).formatToParts(new Date(t));
+    const o={}; parts.forEach(p=>{ if(p.type !== "literal") o[p.type]=p.value; });
+    return {y:o.year, m:o.month, d:o.day, hour:Number(o.hour), minute:Number(o.minute)};
+  }
+  function aggregateTo4H(candles){
+    const groups = new Map();
+    for(const b of candles){
+      const p = trParts(b.t);
+      if(!Number.isFinite(p.hour)) continue;
+      // BIST seansı için 10-14 ve 14-18 blokları. Dış saatleri de en yakın mantıklı bloka atar.
+      let slot = p.hour < 14 ? "10" : "14";
+      if(p.hour < 9 || p.hour > 20) slot = Math.floor(p.hour/4)*4;
+      const key = `${p.y}-${p.m}-${p.d}-${slot}`;
+      let g = groups.get(key);
+      if(!g){ g = {t:b.t, open:b.open, high:b.high, low:b.low, close:b.close, volume:0, groupKey:key, label:`${p.d}.${p.m} ${slot}:00`, sourceCount:0}; groups.set(key,g); }
+      g.high = Math.max(g.high, b.high); g.low = Math.min(g.low, b.low); g.close = b.close; g.volume += b.volume || 0; g.sourceCount++;
+    }
+    return Array.from(groups.values()).sort((a,b)=>a.t-b.t);
+  }
+  function dateLabel(t){ return new Date(t).toLocaleDateString("tr-TR", {day:"2-digit", month:"2-digit"}); }
+
+  function emaArr(values, n){
+    if(!values.length) return [];
+    const k = 2/(n+1), out=[]; let e = values[0];
+    for(const v of values){ e = v*k + e*(1-k); out.push(e); }
+    return out;
+  }
+  function atr(bars, n=14){
+    if(bars.length < 2) return 0;
+    const trs=[];
+    for(let i=1;i<bars.length;i++){
+      const b=bars[i], p=bars[i-1];
+      trs.push(Math.max(b.high-b.low, Math.abs(b.high-p.close), Math.abs(b.low-p.close)));
+    }
+    return avg(trs.slice(-n));
+  }
+  function tick(price){ if(price < 20) return 0.01; if(price < 50) return 0.02; if(price < 100) return 0.05; if(price < 250) return 0.10; if(price < 500) return 0.25; if(price < 1000) return 0.50; if(price < 2500) return 1.00; return 2.50; }
+  function roundUp(x, st){ return Math.ceil((x-1e-12)/st)*st; }
+  function roundDown(x, st){ return Math.floor((x+1e-12)/st)*st; }
+
+  function findPivots(bars, left=3, right=3){
+    const out=[];
+    for(let i=left;i<bars.length-right;i++){
+      let hi=true, lo=true;
+      for(let j=i-left;j<=i+right;j++){
+        if(j===i) continue;
+        if(bars[j].high >= bars[i].high) hi=false;
+        if(bars[j].low <= bars[i].low) lo=false;
+      }
+      if(hi) out.push({type:"R", price:bars[i].high, i, t:bars[i].t, volume:bars[i].volume||0});
+      if(lo) out.push({type:"S", price:bars[i].low, i, t:bars[i].t, volume:bars[i].volume||0});
+    }
+    return out;
+  }
+  function clusterLevels(pivots, bars, price){
+    const tol = Math.max(price*0.009, atr(bars,14)*0.45 || price*0.006);
+    const clusters=[];
+    const sorted = [...pivots].sort((a,b)=>a.price-b.price);
+    for(const p of sorted){
+      let c = clusters.find(c => Math.abs(p.price - c.price) <= tol);
+      if(!c){ c = {type:p.type, points:[], price:p.price, min:p.price, max:p.price, strength:0, touches:0, lastIndex:p.i}; clusters.push(c); }
+      c.points.push(p); c.price = avg(c.points.map(x=>x.price)); c.min = Math.min(...c.points.map(x=>x.price)); c.max = Math.max(...c.points.map(x=>x.price)); c.lastIndex = Math.max(c.lastIndex, p.i);
+    }
+    for(const c of clusters){
+      const touchTol = tol*1.15;
+      c.touches = bars.filter(b => (b.low <= c.price + touchTol && b.high >= c.price - touchTol)).length;
+      const recency = c.lastIndex / Math.max(1,bars.length-1);
+      const volBoost = avg(c.points.map(x=>x.volume||0)) / Math.max(1, avg(bars.map(x=>x.volume||0)));
+      c.strength = Math.round(clamp(c.points.length*18 + c.touches*3 + recency*22 + Math.min(volBoost,3)*6, 0, 100));
+    }
+    const supports = clusters.filter(c=>c.price < price).sort((a,b)=>(price-a.price)-(price-b.price)).slice(0,4);
+    const resists = clusters.filter(c=>c.price > price).sort((a,b)=>(a.price-price)-(b.price-price)).slice(0,4);
+    return {supports, resists, all:clusters};
+  }
+  function regressionChannel(bars, len=120){
+    const n = Math.min(len, bars.length); const start = bars.length-n; const ys = bars.slice(start).map(b=>b.close);
+    const xs = ys.map((_,i)=>i); const mx=avg(xs), my=avg(ys);
+    let num=0, den=0; for(let i=0;i<n;i++){ num+=(xs[i]-mx)*(ys[i]-my); den+=(xs[i]-mx)*(xs[i]-mx); }
+    const slope = den ? num/den : 0; const intercept = my - slope*mx;
+    const resid = ys.map((y,i)=>y-(intercept+slope*i)); const sd = Math.sqrt(avg(resid.map(x=>x*x))) || (ys.at(-1)*0.01);
+    const mult = 1.65;
+    const mid = i => intercept + slope*i;
+    return {start, n, slope, intercept, sd, mult, mid, upper:i=>mid(i)+sd*mult, lower:i=>mid(i)-sd*mult};
+  }
+  function rsi(values, n=14){
+    if(values.length < n+1) return 50;
+    let gains=0, losses=0;
+    const seg = values.slice(-n-1);
+    for(let i=1;i<seg.length;i++){ const d=seg[i]-seg[i-1]; if(d>=0) gains+=d; else losses-=d; }
+    if(losses === 0) return 100;
+    const rs = gains / losses;
+    return 100 - 100/(1+rs);
+  }
+
+  function analyze4H(sym, bars, raw){
+    const closes = bars.map(b=>b.close);
+    const highs = bars.map(b=>b.high), lows = bars.map(b=>b.low);
+    const last = bars.at(-1), price = last.close, st = tick(price), atr14 = atr(bars,14) || price*0.02;
+    const ema20 = emaArr(closes,20), ema50 = emaArr(closes,50), ema200 = emaArr(closes,200);
+    const e20 = ema20.at(-1), e50 = ema50.at(-1), e200 = ema200.at(-1);
+    const pivots = findPivots(bars,3,3);
+    const levels = clusterLevels(pivots, bars, price);
+    const channel = regressionChannel(bars, 120);
+    const idxLast = channel.n-1;
+    const chLow = channel.lower(idxLast), chMid = channel.mid(idxLast), chHigh = channel.upper(idxLast);
+    const chPos = clamp((price - chLow) / Math.max(chHigh-chLow, st), 0, 1);
+    const ret3 = closes.length>3 ? price/closes.at(-4)-1 : 0;
+    const ret8 = closes.length>8 ? price/closes.at(-9)-1 : 0;
+    const ret20 = closes.length>20 ? price/closes.at(-21)-1 : 0;
+    const rsi14 = rsi(closes,14);
+
+    let trendScore = 0;
+    if(channel.slope > 0) trendScore += 9;
+    if(ret20 > 0) trendScore += 6;
+    if(price > chMid) trendScore += 4;
+    if(price > e50) trendScore += 4;
+    if(price > e200 || bars.length < 200) trendScore += 2;
+    trendScore = clamp(trendScore,0,25);
+
+    let emaScore = 0;
+    if(price > e20) emaScore += 5;
+    if(e20 > e50) emaScore += 5;
+    if(e50 > e200 || bars.length < 200) emaScore += 5;
+
+    const nearestSupport = levels.supports[0] || null;
+    const nearestResist = levels.resists[0] || null;
+    const distSupport = nearestSupport ? (price - nearestSupport.price)/price : Infinity;
+    const distResist = nearestResist ? (nearestResist.price - price)/price : Infinity;
+    let srScore = 0;
+    if(nearestSupport){
+      if(distSupport <= 0.012) srScore += 12; else if(distSupport <= 0.025) srScore += 9; else if(distSupport <= 0.045) srScore += 5;
+      srScore += Math.min(5, nearestSupport.strength/20);
+    }
+    if(nearestResist && distResist > 0.018) srScore += 3;
+    srScore = clamp(srScore,0,20);
+
+    let channelScore = 0;
+    if(channel.slope > 0 && chPos <= 0.62) channelScore += 9;
+    else if(channel.slope > 0 && chPos <= 0.82) channelScore += 6;
+    else if(channel.slope <= 0 && chPos <= 0.35) channelScore += 5;
+    if(price >= chLow && price <= chHigh) channelScore += 4;
+    if(chPos < 0.18) channelScore += 2;
+    channelScore = clamp(channelScore,0,15);
+
+    let momScore = 0;
+    if(ret3 > 0) momScore += 4;
+    if(ret8 > 0) momScore += 4;
+    if(ret20 > 0) momScore += 3;
+    if(rsi14 >= 45 && rsi14 <= 68) momScore += 3;
+    else if(rsi14 > 68 && rsi14 < 78) momScore += 1;
+    if(last.close > last.open) momScore += 1;
+    momScore = clamp(momScore,0,15);
+
+    const supportBase = nearestSupport ? nearestSupport.price : chLow;
+    const entryLow = roundDown(Math.max(Math.min(price, supportBase + atr14*0.25), supportBase - atr14*0.15), st);
+    const entryHigh = roundUp(Math.min(price + atr14*0.20, supportBase + atr14*0.70), st);
+    const stop = roundDown(Math.min(supportBase - atr14*0.55, entryLow - st), st);
+    let target1 = nearestResist ? nearestResist.price : chHigh;
+    if(!Number.isFinite(target1) || target1 <= price) target1 = price + atr14*2.0;
+    target1 = roundUp(target1, st);
+    let target2 = levels.resists[1]?.price || chHigh;
+    if(!Number.isFinite(target2) || target2 <= target1) target2 = target1 + atr14*1.4;
+    target2 = roundUp(target2, st);
+    const risk = Math.max(price-stop, st);
+    const reward = Math.max(target1-price, st);
+    const rr = reward / risk;
+    let rrScore = rr >= 2.2 ? 10 : rr >= 1.7 ? 8 : rr >= 1.25 ? 5 : rr >= 1 ? 3 : 0;
+
+    let score = Math.round(trendScore + emaScore + srScore + channelScore + momScore + rrScore);
+    // Fazla tepede veya direnç dibinde kovalamayı azalt.
+    if(chPos > 0.86 && distResist < 0.018) score -= 8;
+    if(rsi14 > 78) score -= 7;
+    score = clamp(score,0,100);
+
+    let decision = "ZAYIF";
+    if(score >= 80) decision = "GİRİŞ BÖLGESİ";
+    else if(score >= 65) decision = "İZLE / KADEME";
+    else if(score >= 50) decision = "NÖTR";
+
+    const trendText = channel.slope > 0 && e20 >= e50 ? "Pozitif" : channel.slope > 0 ? "Toparlanıyor" : price > e50 ? "Yatay/Pozitif" : "Zayıf";
+    const momText = ret8 > 0 && rsi14 < 70 ? "Sağlıklı" : ret8 > 0 ? "Isınmış" : ret3 > 0 ? "Kısa tepki" : "Zayıf";
+    const comments=[];
+    comments.push(`${sym} için ${bars[0].isDaily?"günlük":"4 saatlik"} teknik skor ${score}/100: ${decision}.`);
+    comments.push(`Trend ${trendText.toLowerCase()}; fiyat EMA20 ${price>e20?"üstünde":"altında"}, EMA50 ${price>e50?"üstünde":"altında"}.`);
+    if(nearestSupport) comments.push(`Yakın destek ${fmt(nearestSupport.price)} civarı; fiyata uzaklık ${pct(distSupport)}.`);
+    if(nearestResist) comments.push(`Yakın direnç ${fmt(nearestResist.price)} civarı; fiyata uzaklık ${pct(distResist)}.`);
+    comments.push(`Regresyon kanalı konumu %${(chPos*100).toFixed(0)}; ${chPos<0.35?"alt bölgeye yakın":"orta/üst bölge"}.`);
+    comments.push(`Plan: giriş ${fmt(entryLow)}-${fmt(entryHigh)}, stop ${fmt(stop)}, ilk hedef ${fmt(target1)}, yaklaşık R/R ${rr.toFixed(2)}.`);
+
+    return {sym,bars,raw,price,atr14,ema20,ema50,ema200,e20,e50,e200,pivots,levels,channel,chPos,chLow,chMid,chHigh,ret3,ret8,ret20,rsi14,trendScore,emaScore,srScore,channelScore,momScore,rrScore,score,decision,trendText,momText,nearestSupport,nearestResist,entryLow,entryHigh,stop,target1,target2,rr,comments};
+  }
+
+  function renderAnalysis(a){
+    $("chartTitle").textContent = `${a.sym} ${a.bars[0].isDaily?"1D":"4H"} Teknik Grafik`;
+    const first = new Date(a.bars[0].t).toLocaleDateString("tr-TR"), last = new Date(a.bars.at(-1).t).toLocaleString("tr-TR", {day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit"});
+    $("chartSub").textContent = `${a.bars.length} mum · ${first} → ${last} · kaynak ${a.raw.provider || "worker"}${a.raw.cached?" · cache":""}`;
+    $("wm").textContent = a.sym;
+    $("scoreNum").textContent = a.score;
+    $("decision").textContent = a.decision;
+    const box = $("scoreBox"); box.className = "scoreBox" + (a.score>=80 ? "" : a.score>=65 ? " warnBox" : " badBox");
+    $("mPrice").textContent = fmt(a.price);
+    $("mTrend").textContent = a.trendText;
+    $("mTrend").className = "b " + (a.trendText.includes("Pozitif") ? "good" : a.trendText.includes("Zayıf") ? "bad" : "warn");
+    $("mChannel").textContent = `%${(a.chPos*100).toFixed(0)}`;
+    $("mMomentum").textContent = a.momText;
+    $("mEntry").textContent = `${fmt(a.entryLow)} - ${fmt(a.entryHigh)}`;
+    $("mStop").textContent = fmt(a.stop);
+    $("mTarget").textContent = `${fmt(a.target1)} / ${fmt(a.target2)}`;
+    renderLevels("supports", a.levels.supports, "S");
+    renderLevels("resists", a.levels.resists, "R");
+    $("comments").innerHTML = a.comments.map(x=>`<li>${escapeHtml(x)}</li>`).join("");
+  }
+  function renderLevels(id, arr, type){
+    if(!arr.length){ $(id).innerHTML = `<div class="tiny">Seviye bulunamadı.</div>`; return; }
+    $(id).innerHTML = arr.slice(0,4).map(l => `<div class="level"><div class="p ${type==='S'?'good':'bad'}">${fmt(l.price)}</div><div class="strength"><i style="width:${l.strength}%"></i></div><div class="tiny">${l.points.length} pivot</div></div>`).join("");
+  }
+  function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+
+  function clearAll(){
+    state = {raw:[], bars:[], analysis:null, hover:-1};
+    ["scoreNum","mPrice","mTrend","mChannel","mMomentum","mEntry","mStop","mTarget"].forEach(id=>$(id).textContent="-");
+    $("decision").textContent = "Analiz bekleniyor"; $("scoreBox").className = "scoreBox warnBox";
+    $("supports").innerHTML = `<div class="tiny">-</div>`; $("resists").innerHTML = `<div class="tiny">-</div>`; $("comments").innerHTML = `<li>Hisse kodu yazıp analiz et.</li>`;
+    $("chartTitle").textContent = "4H Teknik Grafik"; $("chartSub").textContent = "Henüz analiz yapılmadı."; $("wm").textContent = "4H";
+    drawEmpty();
+  }
+
+  function setupCanvas(){
+    const c = $("chart"), rect = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    c.width = Math.max(1, Math.floor(rect.width*dpr)); c.height = Math.max(1, Math.floor(rect.height*dpr));
+    const ctx = c.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
+    return {c,ctx,w:rect.width,h:rect.height,dpr};
+  }
+  function drawEmpty(){
+    const {ctx,w,h} = setupCanvas();
+    ctx.clearRect(0,0,w,h); ctx.fillStyle = "#fbfdff"; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = "rgba(31,41,55,.62)"; ctx.font = "14px Inter, Arial"; ctx.textAlign = "center";
+    ctx.fillText("Hisse kodu yazıp Analiz Et'e basın.", w/2, h/2);
+  }
+  function draw(){
+    if(!state.analysis){ drawEmpty(); return; }
+    const {ctx,w,h} = setupCanvas();
+    const a = state.analysis, bars = a.bars;
+    ctx.clearRect(0,0,w,h); ctx.fillStyle = "#fbfdff"; ctx.fillRect(0,0,w,h);
+    const padL=58, padR=86, padT=22, volH=Math.max(92, h*0.18), padB=28, gap=14;
+    const priceH = h - padT - volH - padB - gap;
+    const x0=padL, x1=w-padR, y0=padT, y1=padT+priceH, vy0=y1+gap, vy1=h-padB;
+    const visible = bars.slice(-Math.min(180,bars.length));
+    const startIndex = bars.length - visible.length;
+    const overlays = [a.ema20, a.ema50, a.ema200].flatMap(arr => arr.slice(startIndex).filter(Number.isFinite));
+    const levelPrices = [...a.levels.supports, ...a.levels.resists].slice(0,8).map(l=>l.price);
+    const regVals=[];
+    for(let bi=0;bi<bars.length;bi++){
+      if(bi>=a.channel.start){ const ri = bi - a.channel.start; regVals.push(a.channel.upper(ri), a.channel.lower(ri)); }
+    }
+    const priceVals = visible.flatMap(b=>[b.high,b.low]).concat(overlays, levelPrices, regVals.slice(-visible.length*2), [a.stop,a.entryLow,a.entryHigh,a.target1,a.target2]).filter(Number.isFinite);
+    let minP = Math.min(...priceVals), maxP = Math.max(...priceVals); const padP = (maxP-minP)*0.08 || maxP*0.02; minP-=padP; maxP+=padP;
+    const maxVol = Math.max(...visible.map(b=>b.volume||0),1);
+    const n = visible.length, step = (x1-x0)/Math.max(n,1), cw = Math.max(3, Math.min(11, step*0.62));
+    const X = i => x0 + (i-startIndex+0.5)*step;
+    const Xvis = k => x0 + (k+0.5)*step;
+    const Y = p => y1 - (p-minP)/(maxP-minP)*(y1-y0);
+    const VY = v => vy1 - (v/maxVol)*(vy1-vy0);
+
+    // grid
+    ctx.strokeStyle = "rgba(31,41,55,.075)"; ctx.lineWidth=1; ctx.font="11px Inter, Arial"; ctx.fillStyle="rgba(92,108,132,.88)"; ctx.textAlign="right"; ctx.textBaseline="middle";
+    for(let i=0;i<=6;i++){ const y = y0 + (y1-y0)*i/6; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); const p = maxP - (maxP-minP)*i/6; ctx.fillText(fmt(p), w-12, y); }
+    ctx.strokeStyle="rgba(31,41,55,.10)"; ctx.beginPath(); ctx.moveTo(x0,y1); ctx.lineTo(x1,y1); ctx.moveTo(x0,vy1); ctx.lineTo(x1,vy1); ctx.stroke();
+
+    // regression channel
+    drawChannel(ctx,a,bars,startIndex,n,X,Y,x0,x1);
+
+    // support/resistance zones
+    drawLevels(ctx, a.levels.supports.slice(0,3), Y, x0, x1, true);
+    drawLevels(ctx, a.levels.resists.slice(0,3), Y, x0, x1, false);
+
+    // entry/stop/target
+    drawTradeLine(ctx, Y(a.entryLow), x0, x1, "Giriş alt", "#55d7cb");
+    drawTradeLine(ctx, Y(a.entryHigh), x0, x1, "Giriş üst", "#55d7cb", true);
+    drawTradeLine(ctx, Y(a.stop), x0, x1, "Stop", "#ef6f7b");
+    drawTradeLine(ctx, Y(a.target1), x0, x1, "Hedef 1", "#20b987");
+    drawTradeLine(ctx, Y(a.target2), x0, x1, "Hedef 2", "#20b987", true);
+
+    // EMAs
+    drawLine(ctx, a.ema20, startIndex, X, Y, "#5b8def", 1.7);
+    drawLine(ctx, a.ema50, startIndex, X, Y, "#f2b84b", 1.7);
+    drawLine(ctx, a.ema200, startIndex, X, Y, "#a78bfa", 1.8);
+
+    // candles and volume
+    visible.forEach((b,k)=>{
+      const x=Xvis(k), up=b.close>=b.open, col=up?"#20b987":"#ef6f7b";
+      ctx.strokeStyle=col; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(x,Y(b.high)); ctx.lineTo(x,Y(b.low)); ctx.stroke();
+      const top=Y(Math.max(b.open,b.close)), bot=Y(Math.min(b.open,b.close));
+      ctx.fillStyle=col; ctx.globalAlpha=.88; ctx.fillRect(x-cw/2, top, cw, Math.max(1,bot-top)); ctx.globalAlpha=1;
+      ctx.fillStyle=up?"rgba(32,185,135,.22)":"rgba(239,111,123,.22)"; ctx.fillRect(x-cw/2, VY(b.volume||0), cw, vy1 - VY(b.volume||0));
+    });
+
+    // last price
+    drawTradeLine(ctx, Y(a.price), x0, x1, `Son ${fmt(a.price)}`, "#1f2937");
+
+    // x axis labels
+    ctx.fillStyle="rgba(92,108,132,.82)"; ctx.textAlign="center"; ctx.textBaseline="top"; ctx.font="11px Inter, Arial";
+    const labelEvery = Math.max(8, Math.round(n/8));
+    visible.forEach((b,k)=>{ if(k%labelEvery===0 || k===n-1){ ctx.fillText(b.label || dateLabel(b.t), Xvis(k), vy1+8); } });
+
+    // hover
+    if(state.hover >= 0 && state.hover < visible.length){
+      const b=visible[state.hover], x=Xvis(state.hover);
+      ctx.strokeStyle="rgba(31,41,55,.24)"; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,vy1); ctx.stroke(); ctx.setLineDash([]);
+    }
+  }
+  function drawLine(ctx, arr, startIndex, X, Y, color, width){
+    ctx.strokeStyle=color; ctx.lineWidth=width; ctx.beginPath(); let started=false;
+    for(let i=startIndex;i<arr.length;i++){
+      const v=arr[i]; if(!Number.isFinite(v)) continue; const x=X(i), y=Y(v);
+      if(!started){ ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
+    }
+    if(started) ctx.stroke();
+  }
+  function drawChannel(ctx,a,bars,startIndex,n,X,Y,x0,x1){
+    const ch=a.channel; const first = Math.max(startIndex, ch.start), last = bars.length-1;
+    if(last <= first) return;
+    const xA=X(first), xB=X(last), iA=first-ch.start, iB=last-ch.start;
+    ctx.save(); ctx.strokeStyle="rgba(85,215,203,.78)"; ctx.lineWidth=1.25; ctx.setLineDash([6,5]);
+    [[ch.upper(iA),ch.upper(iB)],[ch.mid(iA),ch.mid(iB)],[ch.lower(iA),ch.lower(iB)]].forEach((pair,idx)=>{ ctx.globalAlpha=idx===1?.72:.55; ctx.beginPath(); ctx.moveTo(xA,Y(pair[0])); ctx.lineTo(xB,Y(pair[1])); ctx.stroke(); });
+    ctx.restore();
+  }
+  function drawLevels(ctx, levels, Y, x0, x1, support){
+    const color = support ? "32,185,135" : "239,111,123";
+    levels.forEach((l,idx)=>{
+      const y=Y(l.price); ctx.fillStyle=`rgba(${color},${idx===0?.13:.07})`; ctx.fillRect(x0,y-7,x1-x0,14);
+      ctx.strokeStyle=`rgba(${color},${idx===0?.86:.55})`; ctx.lineWidth=idx===0?1.5:1; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke();
+      ctx.fillStyle=`rgba(${color},.95)`; ctx.font="11px Inter, Arial"; ctx.textAlign="left"; ctx.textBaseline="bottom"; ctx.fillText(`${support?"Destek":"Direnç"} ${fmt(l.price)}`, x0+6, y-8);
+    });
+  }
+  function drawTradeLine(ctx, y, x0, x1, label, color, dashed=false){
+    if(!Number.isFinite(y)) return;
+    ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=1; if(dashed) ctx.setLineDash([3,4]); ctx.globalAlpha=.75;
+    ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); ctx.globalAlpha=1; ctx.setLineDash([]);
+    ctx.fillStyle=color; ctx.font="11px Inter, Arial"; ctx.textAlign="right"; ctx.textBaseline="middle"; ctx.fillText(label, x1-6, y-9);
+    ctx.restore();
+  }
+  function onMouseMove(e){
+    if(!state.analysis) return;
+    const rect = $("chartWrap").getBoundingClientRect(); const x = e.clientX - rect.left;
+    const padL=58, padR=86, x0=padL, x1=rect.width-padR;
+    const visible = state.bars.slice(-Math.min(180,state.bars.length)); const n=visible.length; const step=(x1-x0)/Math.max(n,1);
+    const k = Math.floor((x-x0)/step); state.hover = clamp(k,0,n-1); draw();
+    const b = visible[state.hover]; const tip=$("tip");
+    tip.innerHTML = `<b>${state.analysis.sym}</b> · ${b.label || dateLabel(b.t)}<br>Açılış ${fmt(b.open)} · Yüksek ${fmt(b.high)} · Düşük ${fmt(b.low)} · Kapanış ${fmt(b.close)}<br>Hacim ${Math.round(b.volume||0).toLocaleString("tr-TR")}`;
+    tip.style.display="block"; tip.style.left = Math.min(rect.width-230, Math.max(8, e.clientX-rect.left+12)) + "px"; tip.style.top = Math.min(rect.height-80, Math.max(8, e.clientY-rect.top+12)) + "px";
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

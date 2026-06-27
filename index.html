@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BIST 4H Teknik Çizici v2</title>
+<title>BIST Basit Teknik</title>
 <style>
   :root{
     --bg:#f6f8ff; --bg2:#eefdf7; --panel:rgba(255,255,255,.78); --panel2:rgba(255,255,255,.92);
@@ -61,17 +61,100 @@
   .footer{margin-top:12px;color:var(--muted);font-size:11px;line-height:1.45}.notice{padding:11px;background:var(--yellow2);border:1px solid #ffe2a2;border-radius:16px;color:#8c6313;font-size:12px;line-height:1.43}
   details summary{cursor:pointer;color:#52647d;font-size:12px;margin-top:10px;font-weight:800}details[open] summary{margin-bottom:8px}.workerLine{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:8px}code{color:#53657e;background:#f3f6fb;border:1px solid #e4ebf6;border-radius:7px;padding:1px 5px}
   .spinner{width:14px;height:14px;border:2px solid rgba(19,32,51,.25);border-top-color:#132033;border-radius:50%;display:none;animation:spin .8s linear infinite;margin-right:6px;vertical-align:-2px}@keyframes spin{to{transform:rotate(360deg)}}.loading .spinner{display:inline-block}
-  @media(max-width:1050px){.layout{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.chartWrap{height:560px}.legend{justify-content:flex-start}.top{display:block}.top .badge{display:inline-block;margin-top:10px}}
+
+  .quickBar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 10px;flex-wrap:wrap}
+  .chipGroup{display:flex;gap:7px;flex-wrap:wrap;min-width:0}
+  .chip{font-size:12px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.66);color:#53657e;border:1px solid #e0e8f4;box-shadow:none}
+  .chip:hover{transform:translateY(-1px)}
+  .chip.active{background:linear-gradient(135deg,#e7fbf8,#eaf0ff);border-color:rgba(85,215,203,.68);color:#1f5664}
+  .quickActions{display:flex;gap:7px;align-items:center}
+  .chartTools{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .zoomTools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+  .zoomTools button{font-size:12px;padding:7px 9px;border-radius:11px;box-shadow:none;background:rgba(255,255,255,.70)}
+  .zoomTools .windowLabel{font-size:11px;color:#708098;border:1px solid #e1e9f5;background:rgba(255,255,255,.62);padding:7px 9px;border-radius:999px}
+  .chartWrap{cursor:crosshair;touch-action:none}
+  .chartWrap.grabbing{cursor:grabbing}
+  .planCard{position:relative;overflow:hidden}
+  .planCard:before{content:"";position:absolute;right:-50px;top:-70px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(85,215,203,.22),transparent 68%);pointer-events:none}
+  .planTop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+  .planTop h3{margin:0;font-size:15px;letter-spacing:-.03em;color:#172033}
+  .setupTag{display:inline-flex;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:950;border:1px solid rgba(255,255,255,.85);background:rgba(255,255,255,.68);white-space:nowrap}
+  .setupTag.good{color:#147a5c;background:#e1f8ef}.setupTag.warn{color:#9a6a0c;background:#fff3d7}.setupTag.bad{color:#a8414b;background:#ffe8eb}
+  .planGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0}
+  .planItem{background:rgba(255,255,255,.62);border:1px solid #e4ebf6;border-radius:15px;padding:10px}
+  .planItem .k{font-size:10px;text-transform:uppercase;letter-spacing:.055em;color:#7b8ba2;font-weight:850}
+  .planItem .v{font-size:17px;font-weight:950;letter-spacing:-.035em;margin-top:3px;color:#1f2937}
+  .planItem.full{grid-column:span 2}
+  .planNote{font-size:12px;color:#5f6f86;line-height:1.45;margin:8px 0 10px}
+  .riskInputs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
+  .riskInputs input{padding:10px 11px;font-size:13px;border-radius:13px}
+  .riskOut{font-size:12px;line-height:1.55;color:#5f6f86;background:rgba(255,255,255,.58);border:1px solid #e4ebf6;border-radius:14px;padding:10px}
+  .riskOut b{color:#1f2937}
+
+
+  .topTools{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+  .themeToggle{
+    width:46px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;gap:2px;
+    border-radius:999px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.72);
+    color:#53657e;box-shadow:var(--shadow2);backdrop-filter:blur(14px)
+  }
+  .themeToggle span{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;font-size:13px;opacity:.45;transition:opacity .16s,transform .16s}
+  body[data-theme="light"] .themeToggle .sun, body[data-theme="dark"] .themeToggle .moon{opacity:1;transform:scale(1.08)}
+  body[data-theme="dark"]{
+    --bg:#070a10;--bg2:#0c111c;--panel:rgba(22,28,40,.76);--panel2:rgba(28,36,51,.90);
+    --line:#263244;--line2:#1b2433;--text:#eef4ff;--muted:#93a3b8;--soft:#74849a;
+    --green:#42d6a4;--green2:#123629;--red:#ff7f91;--red2:#3a1720;--yellow:#f6c86a;--yellow2:#3d2d13;
+    --blue:#8bb3ff;--blue2:#14233d;--cyan:#64dfd4;--cyan2:#123733;--purple:#b9a7ff;--purple2:#281f43;
+    --white:#0f1724;--shadow:0 26px 70px rgba(0,0,0,.36);--shadow2:0 10px 28px rgba(0,0,0,.26);
+    background:
+      radial-gradient(circle at 10% -8%,rgba(100,223,212,.18) 0,transparent 34%),
+      radial-gradient(circle at 88% 0%,rgba(185,167,255,.18) 0,transparent 31%),
+      radial-gradient(circle at 50% 105%,rgba(255,127,145,.12) 0,transparent 35%),
+      linear-gradient(135deg,#070a10 0%,#0b1020 46%,#071811 100%);
+  }
+  body[data-theme="dark"]:before{background-image:linear-gradient(rgba(139,179,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(139,179,255,.055) 1px,transparent 1px)}
+  body[data-theme="dark"] h1, body[data-theme="dark"] .chartTitle, body[data-theme="dark"] .section h3, body[data-theme="dark"] .planTop h3{color:#f1f6ff}
+  body[data-theme="dark"] h1 .muted{color:#bcd1ff;background:rgba(139,179,255,.13);border-color:rgba(139,179,255,.20)}
+  body[data-theme="dark"] .card{background:linear-gradient(180deg,rgba(28,36,51,.78),rgba(16,22,32,.62));border-color:rgba(255,255,255,.08);box-shadow:var(--shadow)}
+  body[data-theme="dark"] .badge, body[data-theme="dark"] .themeToggle{background:rgba(24,31,44,.72);border-color:rgba(255,255,255,.10);color:#b8c6da}
+  body[data-theme="dark"] .input{background:rgba(11,16,25,.78);border-color:#263244;color:#eef4ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+  body[data-theme="dark"] .input:focus{border-color:rgba(100,223,212,.65);box-shadow:0 0 0 4px rgba(100,223,212,.11)}
+  body[data-theme="dark"] button{background:linear-gradient(180deg,rgba(35,45,63,.95),rgba(22,30,43,.94));border-color:rgba(255,255,255,.08);color:#eaf1ff;box-shadow:0 10px 22px rgba(0,0,0,.22)}
+  body[data-theme="dark"] .primary{background:linear-gradient(135deg,#64dfd4,#8bb3ff 54%,#b9a7ff);color:#08101c;border-color:rgba(255,255,255,.18)}
+  body[data-theme="dark"] .seg button, body[data-theme="dark"] .chip{background:rgba(22,30,43,.72);border-color:rgba(255,255,255,.08);color:#aab8cc}
+  body[data-theme="dark"] .seg button.active, body[data-theme="dark"] .chip.active{background:linear-gradient(135deg,rgba(100,223,212,.14),rgba(139,179,255,.13));border-color:rgba(100,223,212,.34);color:#d9fffb}
+  body[data-theme="dark"] .leg, body[data-theme="dark"] .zoomTools .windowLabel{background:rgba(22,30,43,.70);border-color:rgba(255,255,255,.08);color:#aebcd0}
+  body[data-theme="dark"] .chartWrap{background:linear-gradient(180deg,#0d1420,#0a111c);border-color:#263244;box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 18px 40px rgba(0,0,0,.22)}
+  body[data-theme="dark"] .tooltip{background:rgba(17,24,36,.95);border-color:rgba(255,255,255,.12);color:#eaf1ff;box-shadow:0 18px 40px rgba(0,0,0,.38)}
+  body[data-theme="dark"] .watermark{color:rgba(255,255,255,.045)}
+  body[data-theme="dark"] .scoreBox{background:linear-gradient(135deg,rgba(66,214,164,.15),rgba(139,179,255,.10) 62%,rgba(185,167,255,.12));border-color:rgba(255,255,255,.08)}
+  body[data-theme="dark"] .scoreBox.warnBox{background:linear-gradient(135deg,rgba(246,200,106,.14),rgba(139,179,255,.09) 58%,rgba(185,167,255,.10));border-color:rgba(255,255,255,.08)}
+  body[data-theme="dark"] .scoreBox.badBox{background:linear-gradient(135deg,rgba(255,127,145,.14),rgba(246,200,106,.08) 58%,rgba(139,179,255,.08));border-color:rgba(255,255,255,.08)}
+  body[data-theme="dark"] .scoreNum, body[data-theme="dark"] .metric .b, body[data-theme="dark"] .planItem .v, body[data-theme="dark"] .riskOut b{color:#eef4ff}
+  body[data-theme="dark"] .decision, body[data-theme="dark"] .metric, body[data-theme="dark"] .level, body[data-theme="dark"] .comment, body[data-theme="dark"] .riskOut, body[data-theme="dark"] .planItem{
+    background:rgba(22,30,43,.66);border-color:rgba(255,255,255,.08);color:#c8d4e6
+  }
+  body[data-theme="dark"] .setupTag{background:rgba(22,30,43,.72);border-color:rgba(255,255,255,.10)}
+  body[data-theme="dark"] .setupTag.good{color:#a9f5dc;background:rgba(66,214,164,.14)}
+  body[data-theme="dark"] .setupTag.warn{color:#ffe0a0;background:rgba(246,200,106,.13)}
+  body[data-theme="dark"] .setupTag.bad{color:#ffb5bf;background:rgba(255,127,145,.13)}
+  body[data-theme="dark"] .strength{background:#202b3c}
+  body[data-theme="dark"] code{color:#aebcd0;background:#111827;border-color:#263244}
+
+  @media(max-width:1050px){.layout{display:flex;flex-direction:column}.side{order:-1}.controls{grid-template-columns:1fr}.quickBar{align-items:flex-start}.quickActions{width:100%}.quickActions button{flex:1}.chartWrap{height:560px}.legend{justify-content:flex-start}.chartTools{align-items:flex-start}.zoomTools{justify-content:flex-start}.top{display:block}.top .badge{display:inline-block;margin-top:10px}.planGrid,.riskInputs{grid-template-columns:1fr}.planItem.full{grid-column:span 1}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top">
     <div>
-      <h1>BIST 4H Teknik Çizici <span class="muted">v2</span></h1>
-      <div class="sub">Tek hisse için 1 saatlik veriyi worker’dan çeker, tarayıcı içinde 4 saatlik mumlara dönüştürür; destek, direnç, EMA, regresyon kanalı ve giriş/stop/hedef bölgelerini ferah bir grafik ekranında gösterir.</div>
+      <h1>BIST Basit Teknik</h1>
+      <div class="sub">Tek hisse için 1 saatlik veriyi worker’dan çeker; destek, direnç, EMA, regresyon kanalı ve işlem planını tek ekranda pratik şekilde gösterir.</div>
     </div>
-    <div class="badge" id="clock">-</div>
+    <div class="topTools">
+      <div class="badge" id="clock">-</div>
+      <button id="themeToggle" class="themeToggle" type="button" aria-label="Tema değiştir"><span class="sun">☀︎</span><span class="moon">☾</span></button>
+    </div>
   </div>
 
   <section class="card pad">
@@ -91,30 +174,40 @@
       <button id="analyzeBtn" class="primary"><span class="spinner"></span>Analiz Et</button>
       <button id="clearBtn">Temizle</button>
     </div>
-    <details>
-      <summary>Worker ayarı</summary>
-      <div class="workerLine">
-        <input id="workerUrl" class="input" value="https://bist30dataslave.akiftolgagonen.workers.dev" />
-        <button id="saveWorker" class="small">Kaydet</button>
+    <div class="quickBar">
+      <div class="chipGroup" id="quickSymbols"></div>
+      <div class="quickActions">
+        <button id="favBtn" class="small">☆ Favori</button>
+        <button id="copyPlanBtn" class="small" disabled>Planı Kopyala</button>
       </div>
-      <div class="tiny" style="margin-top:7px">Kullanım: <code>?symbol=TSKB&amp;range=1y&amp;interval=60m</code>. 4H mumlar HTML içinde üretilir.</div>
-    </details>
+    </div>
+
   </section>
 
   <div class="layout" style="margin-top:14px">
     <main class="card pad chartCard">
       <div class="chartHead">
         <div>
-          <div class="chartTitle" id="chartTitle">TSKB 4H Teknik Grafik</div>
+          <div class="chartTitle" id="chartTitle">BIST Basit Teknik</div>
           <div class="tiny" id="chartSub">Henüz analiz yapılmadı.</div>
         </div>
-        <div class="legend">
+        <div class="chartTools">
+          <div class="legend">
           <span class="leg"><span class="dot" style="background:#20b987"></span>Destek</span>
           <span class="leg"><span class="dot" style="background:#ef6f7b"></span>Direnç</span>
           <span class="leg"><span class="dot" style="background:#5b8def"></span>EMA20</span>
           <span class="leg"><span class="dot" style="background:#f2b84b"></span>EMA50</span>
           <span class="leg"><span class="dot" style="background:#a78bfa"></span>EMA200</span>
           <span class="leg"><span class="dot" style="background:#55d7cb"></span>Kanal</span>
+          </div>
+          <div class="zoomTools">
+            <button id="zoomOutBtn" title="Uzaklaştır">−</button>
+            <button id="zoomInBtn" title="Yakınlaştır">+</button>
+            <button id="panLeftBtn" title="Sola kaydır">←</button>
+            <button id="panRightBtn" title="Sağa kaydır">→</button>
+            <button id="resetZoomBtn">Sona Git</button>
+            <span class="windowLabel" id="chartWindowLabel">Son görünüm</span>
+          </div>
         </div>
       </div>
       <div class="chartWrap" id="chartWrap">
@@ -130,6 +223,24 @@
         <div class="scoreNum" id="scoreNum">-</div>
         <div class="decision" id="decision">Analiz bekleniyor</div>
       </section>
+
+      <section class="card pad planCard">
+        <div class="planTop">
+          <h3>İşlem planı</h3>
+          <span class="setupTag warn" id="setupTag">Bekleniyor</span>
+        </div>
+        <div class="planGrid">
+          <div class="planItem full"><div class="k">Giriş bölgesi</div><div class="v" id="pEntry">-</div></div>
+          <div class="planItem"><div class="k">Stop</div><div class="v bad" id="pStop">-</div></div>
+          <div class="planItem"><div class="k">Hedefler</div><div class="v good" id="pTargets">-</div></div>
+          <div class="planItem"><div class="k">R/R</div><div class="v" id="pRR">-</div></div>
+          <div class="planItem"><div class="k">Kanal</div><div class="v" id="pChannel">-</div></div>
+        </div>
+        <div class="planNote" id="planNote">Analiz sonrası hızlı işlem planı burada görünür.</div>
+      </section>
+
+
+
 
       <section class="card pad">
         <div class="grid2">
@@ -153,16 +264,9 @@
         <div class="levels" id="resists"><div class="tiny">-</div></div>
       </section>
 
-      <section class="card pad section">
-        <h3>Yorum</h3>
-        <div class="comment"><ul id="comments"><li>Hisse kodu yazıp analiz et.</li></ul></div>
-      </section>
 
-      <section class="card pad section">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><h3 style="margin:0">Log</h3><button id="clearLog" class="small">Temizle</button></div>
-        <div class="log" id="log"></div>
-        <div class="footer">Yatırım tavsiyesi değildir. Public veri gecikmeli olabilir; emir öncesi broker ekranı teyidi gerekir.</div>
-      </section>
+
+
     </aside>
   </div>
 </div>
@@ -175,18 +279,31 @@
   const CACHE_MS = 4 * 60 * 1000;
   const REQ_TIMEOUT = 35000;
   let selectedRange = "1y";
-  let state = {raw:[], bars:[], analysis:null, hover:-1};
+  let state = {raw:[], bars:[], analysis:null, hover:-1, viewStart:0, viewCount:120, dragging:false, dragX:0, dragViewStart:0};
 
   function init(){
-    $("workerUrl").value = localStorage.getItem("bist4h_worker") || DEFAULT_WORKER;
-    $("symbol").value = localStorage.getItem("bist4h_symbol") || "TSKB";
-    selectedRange = localStorage.getItem("bist4h_range") || "1y";
+    const params = new URLSearchParams(location.search);
+    const urlSym = cleanSym(params.get("symbol"));
+    const urlRange = params.get("range");
+    if($("workerUrl")) $("workerUrl").value = localStorage.getItem("bist4h_worker") || DEFAULT_WORKER;
+    $("symbol").value = urlSym || localStorage.getItem("bist4h_symbol") || "TSKB";
+    selectedRange = ["3mo","6mo","1y"].includes(urlRange) ? urlRange : (localStorage.getItem("bist4h_range") || "1y");
     document.querySelectorAll("#rangeSeg button").forEach(b => b.classList.toggle("active", b.dataset.range === selectedRange));
     $("analyzeBtn").addEventListener("click", analyzeSymbol);
     $("symbol").addEventListener("keydown", e => { if(e.key === "Enter") analyzeSymbol(); });
-    $("saveWorker").addEventListener("click", () => { localStorage.setItem("bist4h_worker", $("workerUrl").value.trim()); log("Worker kaydedildi."); });
+    if($("saveWorker")) $("saveWorker").addEventListener("click", () => { localStorage.setItem("bist4h_worker", $("workerUrl")?.value.trim() || DEFAULT_WORKER); log("Worker kaydedildi."); });
     $("clearBtn").addEventListener("click", clearAll);
-    $("clearLog").addEventListener("click", () => $("log").textContent = "");
+    if($("clearLog")) $("clearLog").addEventListener("click", () => $("log").textContent = "");
+    if($("copyPlanBtn")) $("copyPlanBtn").addEventListener("click", copyPlan);
+    if($("favBtn")) $("favBtn").addEventListener("click", toggleFavorite);
+    if($("riskBudget")) $("riskBudget").addEventListener("input", updateRiskCalc);
+    if($("riskPct")) $("riskPct").addEventListener("input", updateRiskCalc);
+    if($("themeToggle")) $("themeToggle").addEventListener("click", toggleTheme);
+    if($("zoomInBtn")) $("zoomInBtn").addEventListener("click", () => zoomChart(0.76));
+    if($("zoomOutBtn")) $("zoomOutBtn").addEventListener("click", () => zoomChart(1.28));
+    if($("panLeftBtn")) $("panLeftBtn").addEventListener("click", () => panChart(-0.32));
+    if($("panRightBtn")) $("panRightBtn").addEventListener("click", () => panChart(0.32));
+    if($("resetZoomBtn")) $("resetZoomBtn").addEventListener("click", resetChartView);
     $("rangeSeg").addEventListener("click", e => {
       const btn = e.target.closest("button[data-range]"); if(!btn) return;
       selectedRange = btn.dataset.range; localStorage.setItem("bist4h_range", selectedRange);
@@ -195,19 +312,92 @@
     const wrap = $("chartWrap");
     wrap.addEventListener("mousemove", onMouseMove);
     wrap.addEventListener("mouseleave", () => { state.hover = -1; $("tip").style.display = "none"; draw(); });
+    wrap.addEventListener("wheel", onChartWheel, {passive:false});
+    wrap.addEventListener("mousedown", startChartDrag);
+    wrap.addEventListener("touchstart", startChartTouch, {passive:false});
+    wrap.addEventListener("touchmove", moveChartTouch, {passive:false});
+    wrap.addEventListener("touchend", endChartDrag);
+    window.addEventListener("mousemove", moveChartDrag);
+    window.addEventListener("mouseup", endChartDrag);
     window.addEventListener("resize", () => draw());
+    applyTheme(localStorage.getItem("bist4h_theme") || "light");
+    renderQuickSymbols();
+    updateFavButton();
     tickClock(); setInterval(tickClock, 1000);
     drawEmpty();
+    if(urlSym) setTimeout(analyzeSymbol, 180);
   }
   function tickClock(){ $("clock").textContent = new Date().toLocaleString("tr-TR", {hour:"2-digit", minute:"2-digit", second:"2-digit"}); }
-  function log(msg){ const line = `[${new Date().toLocaleTimeString("tr-TR")}] ${msg}\n`; $("log").textContent += line; $("log").scrollTop = $("log").scrollHeight; }
+  function log(msg){ const el = $("log"); if(!el) return; const line = `[${new Date().toLocaleTimeString("tr-TR")}] ${msg}\n`; el.textContent += line; el.scrollTop = el.scrollHeight; }
   function setBusy(b){ $("analyzeBtn").disabled = b; $("analyzeBtn").classList.toggle("loading", b); }
   function cleanSym(s){ return String(s || "").trim().toUpperCase().replace(/\.IS$/, "").replace(/[^A-Z0-9]/g, "").slice(0,12); }
-  function normalizedWorkerUrl(){ let u = $("workerUrl").value.trim() || DEFAULT_WORKER; if(!/^https?:\/\//i.test(u)) u = "https://"+u; return u.replace(/\/+$/, ""); }
+  function normalizedWorkerUrl(){ let u = ($("workerUrl")?.value || localStorage.getItem("bist4h_worker") || DEFAULT_WORKER).trim(); if(!/^https?:\/\//i.test(u)) u = "https://"+u; return u.replace(/\/+$/, ""); }
   function fmt(n){ if(!Number.isFinite(n)) return "-"; if(n>=1000) return n.toFixed(1); if(n>=100) return n.toFixed(2); if(n>=10) return n.toFixed(2); return n.toFixed(3); }
   function pct(n){ return Number.isFinite(n) ? (n*100).toFixed(2)+"%" : "-"; }
   function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
   function avg(a){ return a && a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+
+  function applyTheme(theme){
+    const t = theme === "dark" ? "dark" : "light";
+    document.body.dataset.theme = t;
+    localStorage.setItem("bist4h_theme", t);
+    draw();
+  }
+  function toggleTheme(){
+    applyTheme(document.body.dataset.theme === "dark" ? "light" : "dark");
+  }
+  function themeColors(){
+    const dark = document.body.dataset.theme === "dark";
+    return dark ? {
+      chartBg:"#0d1420", grid:"rgba(255,255,255,.075)", axis:"rgba(255,255,255,.13)", label:"rgba(184,198,218,.88)",
+      empty:"rgba(238,244,255,.70)", channel:"rgba(100,223,212,.78)", last:"#eef4ff", hover:"rgba(255,255,255,.24)",
+      volumeUp:"rgba(66,214,164,.20)", volumeDown:"rgba(255,127,145,.20)"
+    } : {
+      chartBg:"#fbfdff", grid:"rgba(31,41,55,.075)", axis:"rgba(31,41,55,.10)", label:"rgba(92,108,132,.88)",
+      empty:"rgba(31,41,55,.62)", channel:"rgba(85,215,203,.78)", last:"#1f2937", hover:"rgba(31,41,55,.24)",
+      volumeUp:"rgba(32,185,135,.22)", volumeDown:"rgba(239,111,123,.22)"
+    };
+  }
+
+
+  const DEFAULT_SYMBOLS = ["TSKB","YKBNK","VAKBN","AKBNK","GARAN","ISCTR","THYAO","TUPRS","ASELS","KCHOL","SOKM","MGROS","EREGL","SISE","BIMAS","TCELL"];
+
+  function readList(key){
+    try{ const x = JSON.parse(localStorage.getItem(key) || "[]"); return Array.isArray(x) ? x.filter(Boolean) : []; }catch(e){ return []; }
+  }
+  function writeList(key, arr){ try{ localStorage.setItem(key, JSON.stringify(arr.slice(0,24))); }catch(e){} }
+  function getFavs(){ return readList("bist4h_favs"); }
+  function getRecents(){ return readList("bist4h_recents"); }
+  function rememberSymbol(sym){
+    const arr = [sym, ...getRecents().filter(x=>x!==sym)];
+    writeList("bist4h_recents", arr);
+    renderQuickSymbols();
+    updateFavButton();
+  }
+  function renderQuickSymbols(){
+    const box = $("quickSymbols"); if(!box) return;
+    const favs = getFavs(), recents = getRecents();
+    const merged = [...favs, ...recents, ...DEFAULT_SYMBOLS].filter((x,i,a)=>a.indexOf(x)===i).slice(0,18);
+    const cur = cleanSym($("symbol").value);
+    box.innerHTML = merged.map(s => `<button class="chip ${s===cur?"active":""}" data-symbol="${s}">${s}</button>`).join("");
+    box.querySelectorAll("button[data-symbol]").forEach(btn => {
+      btn.addEventListener("click", () => { $("symbol").value = btn.dataset.symbol; analyzeSymbol(); });
+    });
+  }
+  function updateFavButton(){
+    const btn = $("favBtn"); if(!btn) return;
+    const sym = cleanSym($("symbol").value);
+    const favs = getFavs();
+    btn.textContent = favs.includes(sym) ? "★ Favori" : "☆ Favori";
+  }
+  function toggleFavorite(){
+    const sym = cleanSym($("symbol").value); if(!sym) return;
+    let favs = getFavs();
+    favs = favs.includes(sym) ? favs.filter(x=>x!==sym) : [sym, ...favs.filter(x=>x!==sym)];
+    writeList("bist4h_favs", favs);
+    renderQuickSymbols(); updateFavButton();
+    log(favs.includes(sym) ? `${sym}: favorilere eklendi.` : `${sym}: favorilerden çıkarıldı.`);
+  }
 
   async function analyzeSymbol(){
     const sym = cleanSym($("symbol").value);
@@ -225,7 +415,9 @@
       }
       if(bars4h.length < 25) throw new Error(`yeterli mum yok: ${bars4h.length}`);
       const analysis = analyze4H(sym, bars4h, raw);
-      state = {raw:raw.candles, bars:bars4h, analysis, hover:-1};
+      const vc = Math.min(150, bars4h.length);
+      state = {raw:raw.candles, bars:bars4h, analysis, hover:-1, viewStart:Math.max(0,bars4h.length-vc), viewCount:vc, dragging:false, dragX:0, dragViewStart:0};
+      rememberSymbol(sym);
       renderAnalysis(analysis);
       draw();
       log(`${sym}: OK ${raw.provider || raw.route || "worker"} | 60m ${raw.candles.length} mum → ${bars4h.length} adet ${bars4h[0].isDaily?"1D":"4H"} mum | skor ${analysis.score}`);
@@ -462,10 +654,68 @@
     $("mEntry").textContent = `${fmt(a.entryLow)} - ${fmt(a.entryHigh)}`;
     $("mStop").textContent = fmt(a.stop);
     $("mTarget").textContent = `${fmt(a.target1)} / ${fmt(a.target2)}`;
+    renderPlan(a);
+    updateRiskCalc();
+    updateChartWindowLabel();
+    if($("copyPlanBtn")) $("copyPlanBtn").disabled = false;
     renderLevels("supports", a.levels.supports, "S");
     renderLevels("resists", a.levels.resists, "R");
-    $("comments").innerHTML = a.comments.map(x=>`<li>${escapeHtml(x)}</li>`).join("");
+    if($("comments")) $("comments").innerHTML = a.comments.map(x=>`<li>${escapeHtml(x)}</li>`).join("");
   }
+
+  function setupSignal(a){
+    const distResist = a.nearestResist ? (a.nearestResist.price - a.price) / a.price : Infinity;
+    const distSupport = a.nearestSupport ? (a.price - a.nearestSupport.price) / a.price : Infinity;
+    if(a.chPos > 0.86 && distResist < 0.018) return {label:"KOVALAMA", cls:"bad", note:"Fiyat kanal/direnç tarafına yakın. Hisse iyi görünse bile burada geç kalmış giriş riski var; destek veya yeni sıkışma beklemek daha sağlıklı."};
+    if(a.score >= 80 && a.rr >= 1.45) return {label:"TEMİZ SETUP", cls:"good", note:"Skor güçlü, R/R kabul edilebilir. Plan çalışırsa giriş bölgesi-stop-hedef yapısı net."};
+    if(a.score >= 65 && distSupport < 0.04) return {label:"KADEME DENENİR", cls:"good", note:"Destek yakın ve skor yeterli. Tek seferde kovalamak yerine giriş bölgesinde kademe mantığı daha rahat."};
+    if(a.score >= 55) return {label:"İZLE", cls:"warn", note:"Yapı tamamen kötü değil ama giriş kalitesi mükemmel değil. Daha net destek tepkisi veya direnç kırılımı beklemek mantıklı."};
+    return {label:"BEKLE", cls:"bad", note:"Skor zayıf. Bu görünümde işlem açmak yerine daha temiz setup beklemek daha güvenli."};
+  }
+  function renderPlan(a){
+    const sig = setupSignal(a);
+    if($("setupTag")){ $("setupTag").textContent = sig.label; $("setupTag").className = "setupTag " + sig.cls; }
+    if($("pEntry")) $("pEntry").textContent = `${fmt(a.entryLow)} - ${fmt(a.entryHigh)}`;
+    if($("pStop")) $("pStop").textContent = fmt(a.stop);
+    if($("pTargets")) $("pTargets").textContent = `${fmt(a.target1)} / ${fmt(a.target2)}`;
+    if($("pRR")) $("pRR").textContent = a.rr.toFixed(2);
+    if($("pChannel")) $("pChannel").textContent = `%${(a.chPos*100).toFixed(0)}`;
+    if($("planNote")) $("planNote").textContent = sig.note;
+  }
+  async function copyPlan(){
+    if(!state.analysis) return;
+    const a = state.analysis, sig = setupSignal(a);
+    const text = `${a.sym} teknik plan
+Karar: ${sig.label} · Skor ${a.score}/100
+Giriş: ${fmt(a.entryLow)} - ${fmt(a.entryHigh)}
+Stop: ${fmt(a.stop)}
+Hedef: ${fmt(a.target1)} / ${fmt(a.target2)}
+R/R: ${a.rr.toFixed(2)}
+Trend: ${a.trendText}
+Not: ${sig.note}
+Yatırım tavsiyesi değildir.`;
+    try{ await navigator.clipboard.writeText(text); log(`${a.sym}: plan kopyalandı.`); }
+    catch(e){ prompt("Planı kopyala:", text); }
+  }
+  function updateRiskCalc(){
+    const out = $("riskOut"); if(!out) return;
+    if(!state.analysis){ out.textContent = "Analiz sonrası adet ve risk hesabı görünür."; return; }
+    const a = state.analysis;
+    const budget = Math.max(0, Number($("riskBudget")?.value || 0));
+    const riskPct = Math.max(0, Number($("riskPct")?.value || 0)) / 100;
+    if(!budget || !riskPct){ out.textContent = "Bütçe ve risk yüzdesi gir."; return; }
+    const plannedEntry = a.entryHigh || a.price;
+    const perShareRisk = Math.max(plannedEntry - a.stop, tick(a.price));
+    const maxLoss = budget * riskPct;
+    const qtyByRisk = Math.floor(maxLoss / perShareRisk);
+    const qtyByBudget = Math.floor(budget / plannedEntry);
+    const qty = Math.max(0, Math.min(qtyByRisk, qtyByBudget));
+    const cost = qty * plannedEntry;
+    const loss = qty * perShareRisk;
+    const gain1 = qty * Math.max(0, a.target1 - plannedEntry);
+    out.innerHTML = `Yaklaşık <b>${qty.toLocaleString("tr-TR")} adet</b> · Maliyet <b>${Math.round(cost).toLocaleString("tr-TR")} TL</b><br>Maks. zarar <b>${Math.round(loss).toLocaleString("tr-TR")} TL</b> · Hedef 1 potansiyel <b>${Math.round(gain1).toLocaleString("tr-TR")} TL</b>`;
+  }
+
   function renderLevels(id, arr, type){
     if(!arr.length){ $(id).innerHTML = `<div class="tiny">Seviye bulunamadı.</div>`; return; }
     $(id).innerHTML = arr.slice(0,4).map(l => `<div class="level"><div class="p ${type==='S'?'good':'bad'}">${fmt(l.price)}</div><div class="strength"><i style="width:${l.strength}%"></i></div><div class="tiny">${l.points.length} pivot</div></div>`).join("");
@@ -473,11 +723,17 @@
   function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
 
   function clearAll(){
-    state = {raw:[], bars:[], analysis:null, hover:-1};
+    state = {raw:[], bars:[], analysis:null, hover:-1, viewStart:0, viewCount:120, dragging:false, dragX:0, dragViewStart:0};
     ["scoreNum","mPrice","mTrend","mChannel","mMomentum","mEntry","mStop","mTarget"].forEach(id=>$(id).textContent="-");
     $("decision").textContent = "Analiz bekleniyor"; $("scoreBox").className = "scoreBox warnBox";
-    $("supports").innerHTML = `<div class="tiny">-</div>`; $("resists").innerHTML = `<div class="tiny">-</div>`; $("comments").innerHTML = `<li>Hisse kodu yazıp analiz et.</li>`;
-    $("chartTitle").textContent = "4H Teknik Grafik"; $("chartSub").textContent = "Henüz analiz yapılmadı."; $("wm").textContent = "4H";
+    $("supports").innerHTML = `<div class="tiny">-</div>`; $("resists").innerHTML = `<div class="tiny">-</div>`; if($("comments")) $("comments").innerHTML = `<li>Hisse kodu yazıp analiz et.</li>`;
+    ["pEntry","pStop","pTargets","pRR","pChannel"].forEach(id=>{ if($(id)) $(id).textContent="-"; });
+    if($("setupTag")){ $("setupTag").textContent="Bekleniyor"; $("setupTag").className="setupTag warn"; }
+    if($("planNote")) $("planNote").textContent="Analiz sonrası hızlı işlem planı burada görünür.";
+    if($("copyPlanBtn")) $("copyPlanBtn").disabled = true;
+    updateRiskCalc();
+    $("chartTitle").textContent = "BIST Basit Teknik"; $("chartSub").textContent = "Henüz analiz yapılmadı."; $("wm").textContent = "4H";
+    updateChartWindowLabel();
     drawEmpty();
   }
 
@@ -488,21 +744,125 @@
     return {c,ctx,w:rect.width,h:rect.height,dpr};
   }
   function drawEmpty(){
-    const {ctx,w,h} = setupCanvas();
-    ctx.clearRect(0,0,w,h); ctx.fillStyle = "#fbfdff"; ctx.fillRect(0,0,w,h);
-    ctx.fillStyle = "rgba(31,41,55,.62)"; ctx.font = "14px Inter, Arial"; ctx.textAlign = "center";
+    const {ctx,w,h} = setupCanvas(), tc = themeColors();
+    ctx.clearRect(0,0,w,h); ctx.fillStyle = tc.chartBg; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = tc.empty; ctx.font = "14px Inter, Arial"; ctx.textAlign = "center";
     ctx.fillText("Hisse kodu yazıp Analiz Et'e basın.", w/2, h/2);
   }
+
+  function getVisibleBars(){
+    const bars = state.bars || [];
+    const total = bars.length;
+    if(!total) return {visible:[], start:0, count:0};
+    const minCount = Math.min(25, total);
+    let count = Math.round(state.viewCount || Math.min(150,total));
+    count = Math.max(minCount, Math.min(total, count));
+    let start = Math.round(state.viewStart ?? Math.max(0,total-count));
+    start = Math.max(0, Math.min(Math.max(0,total-count), start));
+    state.viewStart = start; state.viewCount = count;
+    return {visible:bars.slice(start,start+count), start, count};
+  }
+  function updateChartWindowLabel(){
+    const el = $("chartWindowLabel"); if(!el) return;
+    if(!state.analysis || !state.bars.length){ el.textContent = "Son görünüm"; return; }
+    const v = getVisibleBars();
+    el.textContent = `${v.start+1}-${v.start+v.count} / ${state.bars.length}`;
+  }
+  function zoomChart(factor, anchorRatio=0.5){
+    if(!state.analysis || !state.bars.length) return;
+    const total = state.bars.length;
+    const oldCount = state.viewCount || Math.min(150,total);
+    const minCount = Math.min(25,total);
+    const newCount = Math.round(clamp(oldCount * factor, minCount, total));
+    const center = (state.viewStart || 0) + oldCount * anchorRatio;
+    state.viewStart = Math.round(clamp(center - newCount * anchorRatio, 0, Math.max(0,total-newCount)));
+    state.viewCount = newCount; state.hover = -1;
+    updateChartWindowLabel(); draw();
+  }
+  function panChart(ratio){
+    if(!state.analysis || !state.bars.length) return;
+    const shift = Math.round((state.viewCount || 100) * ratio);
+    state.viewStart = Math.round(clamp((state.viewStart || 0) + shift, 0, Math.max(0,state.bars.length - (state.viewCount || 100))));
+    state.hover = -1; updateChartWindowLabel(); draw();
+  }
+  function resetChartView(){
+    if(!state.analysis || !state.bars.length) return;
+    const vc = Math.min(150, state.bars.length);
+    state.viewCount = vc; state.viewStart = Math.max(0, state.bars.length - vc); state.hover = -1;
+    updateChartWindowLabel(); draw();
+  }
+  function onChartWheel(e){
+    if(!state.analysis) return;
+    e.preventDefault();
+    const rect = $("chartWrap").getBoundingClientRect();
+    const padL=58, padR=86, x0=padL, x1=rect.width-padR;
+    const ratio = clamp((e.clientX - rect.left - x0) / Math.max(1,x1-x0), 0, 1);
+    zoomChart(e.deltaY > 0 ? 1.16 : 0.86, ratio);
+  }
+  function startChartDrag(e){
+    if(!state.analysis) return;
+    state.dragging = true; state.dragX = e.clientX; state.dragViewStart = state.viewStart || 0;
+    $("chartWrap").classList.add("grabbing");
+  }
+  function moveChartDrag(e){
+    if(!state.dragging || !state.analysis) return;
+    const rect = $("chartWrap").getBoundingClientRect();
+    const step = (rect.width - 58 - 86) / Math.max(1, state.viewCount || 100);
+    const shift = Math.round(-(e.clientX - state.dragX) / Math.max(1,step));
+    state.viewStart = Math.round(clamp(state.dragViewStart + shift, 0, Math.max(0,state.bars.length - (state.viewCount || 100))));
+    state.hover = -1; updateChartWindowLabel(); draw();
+  }
+  function endChartDrag(){
+    state.dragging = false;
+    const wrap = $("chartWrap"); if(wrap) wrap.classList.remove("grabbing");
+  }
+  function touchDistance(touches){
+    if(touches.length < 2) return 0;
+    const dx = touches[0].clientX - touches[1].clientX, dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+  let touchState = {mode:null, x:0, startView:0, dist:0, count:0};
+  function startChartTouch(e){
+    if(!state.analysis) return;
+    e.preventDefault();
+    if(e.touches.length === 1){
+      touchState = {mode:"drag", x:e.touches[0].clientX, startView:state.viewStart || 0, dist:0, count:state.viewCount || 100};
+    }else if(e.touches.length >= 2){
+      touchState = {mode:"pinch", x:0, startView:state.viewStart || 0, dist:touchDistance(e.touches), count:state.viewCount || 100};
+    }
+  }
+  function moveChartTouch(e){
+    if(!state.analysis || !touchState.mode) return;
+    e.preventDefault();
+    if(touchState.mode === "drag" && e.touches.length === 1){
+      const rect = $("chartWrap").getBoundingClientRect();
+      const step = (rect.width - 58 - 86) / Math.max(1, state.viewCount || 100);
+      const shift = Math.round(-(e.touches[0].clientX - touchState.x) / Math.max(1,step));
+      state.viewStart = Math.round(clamp(touchState.startView + shift, 0, Math.max(0,state.bars.length - (state.viewCount || 100))));
+      state.hover = -1; updateChartWindowLabel(); draw();
+    }else if(touchState.mode === "pinch" && e.touches.length >= 2){
+      const d = touchDistance(e.touches);
+      if(d > 0 && touchState.dist > 0){
+        const factor = touchState.dist / d;
+        state.viewCount = Math.round(clamp(touchState.count * factor, Math.min(25,state.bars.length), state.bars.length));
+        state.viewStart = Math.round(clamp(touchState.startView, 0, Math.max(0,state.bars.length - state.viewCount)));
+        state.hover = -1; updateChartWindowLabel(); draw();
+      }
+    }
+  }
+
   function draw(){
     if(!state.analysis){ drawEmpty(); return; }
-    const {ctx,w,h} = setupCanvas();
+    const {ctx,w,h} = setupCanvas(), tc = themeColors();
     const a = state.analysis, bars = a.bars;
-    ctx.clearRect(0,0,w,h); ctx.fillStyle = "#fbfdff"; ctx.fillRect(0,0,w,h);
+    ctx.clearRect(0,0,w,h); ctx.fillStyle = tc.chartBg; ctx.fillRect(0,0,w,h);
     const padL=58, padR=86, padT=22, volH=Math.max(92, h*0.18), padB=28, gap=14;
     const priceH = h - padT - volH - padB - gap;
     const x0=padL, x1=w-padR, y0=padT, y1=padT+priceH, vy0=y1+gap, vy1=h-padB;
-    const visible = bars.slice(-Math.min(180,bars.length));
-    const startIndex = bars.length - visible.length;
+    const vw = getVisibleBars();
+    const visible = vw.visible;
+    const startIndex = vw.start;
+    updateChartWindowLabel();
     const overlays = [a.ema20, a.ema50, a.ema200].flatMap(arr => arr.slice(startIndex).filter(Number.isFinite));
     const levelPrices = [...a.levels.supports, ...a.levels.resists].slice(0,8).map(l=>l.price);
     const regVals=[];
@@ -519,9 +879,9 @@
     const VY = v => vy1 - (v/maxVol)*(vy1-vy0);
 
     // grid
-    ctx.strokeStyle = "rgba(31,41,55,.075)"; ctx.lineWidth=1; ctx.font="11px Inter, Arial"; ctx.fillStyle="rgba(92,108,132,.88)"; ctx.textAlign="right"; ctx.textBaseline="middle";
+    ctx.strokeStyle = tc.grid; ctx.lineWidth=1; ctx.font="11px Inter, Arial"; ctx.fillStyle=tc.label; ctx.textAlign="right"; ctx.textBaseline="middle";
     for(let i=0;i<=6;i++){ const y = y0 + (y1-y0)*i/6; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); const p = maxP - (maxP-minP)*i/6; ctx.fillText(fmt(p), w-12, y); }
-    ctx.strokeStyle="rgba(31,41,55,.10)"; ctx.beginPath(); ctx.moveTo(x0,y1); ctx.lineTo(x1,y1); ctx.moveTo(x0,vy1); ctx.lineTo(x1,vy1); ctx.stroke();
+    ctx.strokeStyle=tc.axis; ctx.beginPath(); ctx.moveTo(x0,y1); ctx.lineTo(x1,y1); ctx.moveTo(x0,vy1); ctx.lineTo(x1,vy1); ctx.stroke();
 
     // regression channel
     drawChannel(ctx,a,bars,startIndex,n,X,Y,x0,x1);
@@ -548,21 +908,21 @@
       ctx.strokeStyle=col; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(x,Y(b.high)); ctx.lineTo(x,Y(b.low)); ctx.stroke();
       const top=Y(Math.max(b.open,b.close)), bot=Y(Math.min(b.open,b.close));
       ctx.fillStyle=col; ctx.globalAlpha=.88; ctx.fillRect(x-cw/2, top, cw, Math.max(1,bot-top)); ctx.globalAlpha=1;
-      ctx.fillStyle=up?"rgba(32,185,135,.22)":"rgba(239,111,123,.22)"; ctx.fillRect(x-cw/2, VY(b.volume||0), cw, vy1 - VY(b.volume||0));
+      ctx.fillStyle=up?tc.volumeUp:tc.volumeDown; ctx.fillRect(x-cw/2, VY(b.volume||0), cw, vy1 - VY(b.volume||0));
     });
 
     // last price
-    drawTradeLine(ctx, Y(a.price), x0, x1, `Son ${fmt(a.price)}`, "#1f2937");
+    drawTradeLine(ctx, Y(a.price), x0, x1, `Son ${fmt(a.price)}`, tc.last);
 
     // x axis labels
-    ctx.fillStyle="rgba(92,108,132,.82)"; ctx.textAlign="center"; ctx.textBaseline="top"; ctx.font="11px Inter, Arial";
+    ctx.fillStyle=tc.label; ctx.textAlign="center"; ctx.textBaseline="top"; ctx.font="11px Inter, Arial";
     const labelEvery = Math.max(8, Math.round(n/8));
     visible.forEach((b,k)=>{ if(k%labelEvery===0 || k===n-1){ ctx.fillText(b.label || dateLabel(b.t), Xvis(k), vy1+8); } });
 
     // hover
     if(state.hover >= 0 && state.hover < visible.length){
       const b=visible[state.hover], x=Xvis(state.hover);
-      ctx.strokeStyle="rgba(31,41,55,.24)"; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,vy1); ctx.stroke(); ctx.setLineDash([]);
+      ctx.strokeStyle=tc.hover; ctx.setLineDash([4,4]); ctx.beginPath(); ctx.moveTo(x,y0); ctx.lineTo(x,vy1); ctx.stroke(); ctx.setLineDash([]);
     }
   }
   function drawLine(ctx, arr, startIndex, X, Y, color, width){
@@ -577,7 +937,8 @@
     const ch=a.channel; const first = Math.max(startIndex, ch.start), last = bars.length-1;
     if(last <= first) return;
     const xA=X(first), xB=X(last), iA=first-ch.start, iB=last-ch.start;
-    ctx.save(); ctx.strokeStyle="rgba(85,215,203,.78)"; ctx.lineWidth=1.25; ctx.setLineDash([6,5]);
+    const tc = themeColors();
+    ctx.save(); ctx.strokeStyle=tc.channel; ctx.lineWidth=1.25; ctx.setLineDash([6,5]);
     [[ch.upper(iA),ch.upper(iB)],[ch.mid(iA),ch.mid(iB)],[ch.lower(iA),ch.lower(iB)]].forEach((pair,idx)=>{ ctx.globalAlpha=idx===1?.72:.55; ctx.beginPath(); ctx.moveTo(xA,Y(pair[0])); ctx.lineTo(xB,Y(pair[1])); ctx.stroke(); });
     ctx.restore();
   }
@@ -600,7 +961,7 @@
     if(!state.analysis) return;
     const rect = $("chartWrap").getBoundingClientRect(); const x = e.clientX - rect.left;
     const padL=58, padR=86, x0=padL, x1=rect.width-padR;
-    const visible = state.bars.slice(-Math.min(180,state.bars.length)); const n=visible.length; const step=(x1-x0)/Math.max(n,1);
+    const vw = getVisibleBars(); const visible = vw.visible; const n=visible.length; const step=(x1-x0)/Math.max(n,1);
     const k = Math.floor((x-x0)/step); state.hover = clamp(k,0,n-1); draw();
     const b = visible[state.hover]; const tip=$("tip");
     tip.innerHTML = `<b>${state.analysis.sym}</b> · ${b.label || dateLabel(b.t)}<br>Açılış ${fmt(b.open)} · Yüksek ${fmt(b.high)} · Düşük ${fmt(b.low)} · Kapanış ${fmt(b.close)}<br>Hacim ${Math.round(b.volume||0).toLocaleString("tr-TR")}`;
